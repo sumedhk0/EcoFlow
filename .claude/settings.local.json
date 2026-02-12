@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:upstash.com)",
+      "WebFetch(domain:www.react-graph-gallery.com)",
+      "WebFetch(domain:blog.theinfosecguy.xyz)",
+      "WebFetch(domain:snyk.io)",
+      "WebFetch(domain:python.useinstructor.com)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:supabase.com)",
+      "Bash(node --version:*)",
+      "Bash(docker:*)",
+      "Bash(python:*)",
+      "Bash(npx create-next-app --help)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(pip install:*)"
+    ]
+  }
+}
