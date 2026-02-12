@@ -15,6 +15,7 @@ from upstash_redis import Redis
 
 from config import settings
 from services.llm import LLMService
+from services.product_fetcher import ProductFetcher
 from services.calculator import calculate_lca
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ logging.basicConfig(level=logging.INFO)
 # Service singletons (initialized on startup)
 # ---------------------------------------------------------------------------
 llm_service: LLMService | None = None
+product_fetcher: ProductFetcher | None = None
 redis_client: Redis | None = None
 supabase_client = None
 
@@ -31,7 +33,7 @@ supabase_client = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize services once during application startup."""
-    global llm_service, redis_client, supabase_client
+    global llm_service, product_fetcher, redis_client, supabase_client
 
     # LLM Service
     if settings.anthropic_api_key:
@@ -39,6 +41,13 @@ async def lifespan(app: FastAPI):
         logger.info("Anthropic LLM service initialized")
     else:
         logger.warning("ANTHROPIC_API_KEY not set — LLM service unavailable")
+
+    # Product Fetcher (Rainforest API)
+    if settings.rainforest_api_key:
+        product_fetcher = ProductFetcher(api_key=settings.rainforest_api_key)
+        logger.info("Rainforest product fetcher initialized")
+    else:
+        logger.warning("RAINFOREST_API_KEY not set — auto-fetch disabled")
 
     # Redis
     if settings.upstash_redis_url and settings.upstash_redis_token:
@@ -95,7 +104,7 @@ async def health():
 @app.get("/analyze/{asin}")
 async def analyze(
     asin: str,
-    description: str = Query(..., description="Product description text"),
+    description: str | None = Query(None, description="Product description text (optional — auto-fetched from Amazon if omitted)"),
     eol_scenario: str = Query("baseline", description="EOL scenario: baseline, best_case, worst_case"),
 ):
     """
@@ -104,8 +113,9 @@ async def analyze(
     Cache-aside pattern:
       1. Check Redis cache
       2. Check Supabase persistent store
-      3. Compute via LLM + Calculator
-      4. Write back to Redis + Supabase
+      3. Fetch product data (Rainforest API or provided description)
+      4. Compute via LLM + Calculator
+      5. Write back to Redis + Supabase
     """
     cache_key = f"lca:{asin}"
 
@@ -141,6 +151,19 @@ async def analyze(
                 return result
         except Exception as e:
             logger.warning(f"Supabase read error: {e}")
+
+    # --- Resolve product description ---------------------------------------
+    if not description:
+        if not product_fetcher:
+            raise HTTPException(
+                status_code=503,
+                detail="No description provided and Rainforest API not configured. Set RAINFOREST_API_KEY or provide a description.",
+            )
+        try:
+            description = await product_fetcher.fetch_product(asin)
+        except Exception as e:
+            logger.error(f"Product fetch failed for {asin}: {e}")
+            raise HTTPException(status_code=502, detail=f"Failed to fetch product data: {str(e)}")
 
     # --- Layer 3: Compute --------------------------------------------------
     if not llm_service:

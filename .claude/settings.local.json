@@ -17,7 +17,9 @@
       "Bash(npx create-next-app@latest:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "WebFetch(domain:www.rainforestapi.com)",
+      "WebFetch(domain:docs.trajectdata.com)"
     ]
   }
 }
