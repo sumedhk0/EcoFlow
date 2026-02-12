@@ -61,6 +61,7 @@ SUPABASE_KEY=your-anon-key
 UPSTASH_REDIS_URL=https://your-db.upstash.io
 UPSTASH_REDIS_TOKEN=your-token
 ANTHROPIC_API_KEY=sk-ant-...
+RAINFOREST_API_KEY=your-anon-key
 ```
 
 ## Running with Docker
