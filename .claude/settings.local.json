@@ -19,7 +19,12 @@
       "Bash(npm run build:*)",
       "Bash(pip install:*)",
       "WebFetch(domain:www.rainforestapi.com)",
-      "WebFetch(domain:docs.trajectdata.com)"
+      "WebFetch(domain:docs.trajectdata.com)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "WebFetch(domain:motion.dev)",
+      "WebFetch(domain:www.tremor.so)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(npx shadcn@latest add card button input badge tooltip tabs separator -y)"
     ]
   }
 }
