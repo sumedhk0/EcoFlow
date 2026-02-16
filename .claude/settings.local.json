@@ -24,7 +24,13 @@
       "WebFetch(domain:motion.dev)",
       "WebFetch(domain:www.tremor.so)",
       "Bash(npx shadcn@latest init:*)",
-      "Bash(npx shadcn@latest add card button input badge tooltip tabs separator -y)"
+      "Bash(npx shadcn@latest add card button input badge tooltip tabs separator -y)",
+      "Bash(git ls-tree:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git submodule status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd frontend source files \\(fix broken submodule\\)\n\nThe frontend directory was incorrectly tracked as a git submodule\nreference because create-next-app initialized its own .git inside it.\nThis removes the submodule pointer and adds all frontend files as\nregular tracked files so Vercel can detect the Next.js project.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)"
     ]
   }
 }
